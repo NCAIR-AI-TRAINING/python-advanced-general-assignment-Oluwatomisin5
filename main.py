@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 class DuplicateVisitorError(Exception):
@@ -51,7 +51,11 @@ def add_visitor(visitor_name):
     # Rule 1: No duplicate consecutive visitors
     if last_name == visitor_name:
         raise DuplicateVisitorError(visitor_name)
-
+    # Rule 2: 5-minute wait if last visitor is different
+    if last_time:
+        time_diff = (now - last_time).total_seconds() / 60  # in minutes
+        if time_diff < 5:
+            raise EarlyEntryError()
     # Append to file
     with open(FILENAME, "a") as f:
         f.write(f"{visitor_name} | {now.isoformat()}\n")
